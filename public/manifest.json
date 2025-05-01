@@ -1,0 +1,26 @@
+{
+  "name": "TickForCanvas",
+  "version": "1.0",
+  "manifest_version": 3,
+  "description": "A Chrome extension that adds a pomodoro to Canvas.",
+  "background": {
+    "service_worker": "assets/background.js",
+    "type": "module"
+  },
+  "action": {
+    "default_popup": "popup/index.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://*.instructure.com/*"],
+      "js": ["assets/content.js"]
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "matches": ["https://*.instructure.com/*"],
+      "resources": ["assets/*"]
+    }
+  ],
+  "permissions": ["storage"]
+}
