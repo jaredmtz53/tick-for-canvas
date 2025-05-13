@@ -10,9 +10,11 @@ export default defineConfig({
     rollupOptions: {
       input: {
         popup: './popup/index.html',
+       
       },
       output: {
         entryFileNames: "assets/[name].js",
+        
       }
 
     }
