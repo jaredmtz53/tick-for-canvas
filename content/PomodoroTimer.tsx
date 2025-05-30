@@ -1,88 +1,85 @@
 import React, { useEffect } from "react";
-import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
-import "react-circular-progressbar/dist/styles.css";
-// @ts-ignore
-
+import TimerProgress from "./TimerProgress";
 function PomodoroTimer() {
-  const [fixedTime, setFixedTime] = React.useState(0);
-  const [isPlaying, setIsPlaying] = React.useState(false);
+  // used for the initial time input
+  const [initialTime, setInitialTime] = React.useState(0);
+  // used for the remaining time in the timer
   const [remainingTime, setRemainingTime] = React.useState(0);
+  // used to track the status of the timer (running or paused)
+  const [timerStatus, setTimerStatus] = React.useState(false); //False means paused, True means running
 
   useEffect(() => {
-    const handleMessage = (request: any) => {
-      if (request.type === "timerTick") {
-        setRemainingTime(request.remainingTime);
+    chrome.storage.local.get(["remainingTime", "initialTime"], (result) => {
+      setRemainingTime(result.remainingTime || 0);
+      setInitialTime(result.initialTime || 0);
+    });
+    const handleMessage = (message, sender, sendResponse) => {
+      if (message.type === "update_timer") {
+        setRemainingTime(message.remainingTime);
+        setTimerStatus(message.status);
       }
     };
-    chrome.storage.local.get(["timerStatus"], (res) => {
-        console.log("Current timer status:", res.timerStatus);
-      setIsPlaying(res.timerStatus ?? false);
-    });
     chrome.runtime.onMessage.addListener(handleMessage);
     return () => {
       chrome.runtime.onMessage.removeListener(handleMessage);
     };
   }, []);
 
-  const sendUpdateStatus = () => {
-    const newStatus = !isPlaying;
-    setIsPlaying(newStatus);
-
-    let durationToSend;
-    if (newStatus) {
-      if (remainingTime > 0) {
-        durationToSend = remainingTime;
-      } else {
-        durationToSend = fixedTime * 60 * 1000; // Convert minutes to milliseconds
-      }
-    } else {
-      durationToSend = remainingTime;
-    }
-    chrome.runtime.sendMessage({
-      type: "set_timer_status",
-      status: newStatus,
-      duration: durationToSend, // Convert minutes to milliseconds
-    });
-  };
-
-  const formatTime = (timeInMs: number) => {
+  const formatTime = (timeInMs) => {
     const totalSeconds = Math.ceil(timeInMs / 1000);
     const minutes = Math.floor(totalSeconds / 60);
     const seconds = totalSeconds % 60;
-    return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+    return `${minutes.toString().padStart(2, "0")}:${seconds
+      .toString()
+      .padStart(2, "0")}`;
   };
 
-  const handleReset = () => {
-    setIsPlaying(false);
-    setRemainingTime(0);
-    chrome.runtime.sendMessage({
-      type: "reset_timer",
-      timerStatus: false,
+  const toggleTimerStatus = () => {
+    setTimerStatus((prev) => {
+      const newStatus = !prev;
+
+      const durationToSend =
+        remainingTime > 0 ? remainingTime : initialTime * 60 * 1000;
+      chrome.runtime.sendMessage({
+        type: "set_timer_status",
+        status: newStatus,
+        duration: durationToSend,
+      });
+      return newStatus;
     });
   };
-
-  const totalDuration = fixedTime * 60 * 1000;
-  const percentage = totalDuration > 0
-  ? ((totalDuration - remainingTime) / totalDuration) * 100
-  : 0;
-  
+  const toggleReset = () => {
+    setRemainingTime(0);
+    setTimerStatus(false);
+    setInitialTime(0);
+    chrome.runtime.sendMessage({
+      type: "reset_timer",
+    });
+  };
   return (
     <div>
-      <h1>Pomodoro Timer</h1>
-        <h2>{formatTime(remainingTime)}</h2>
-      <input
-        min={1}
-        onChange={(e) => setFixedTime(Number(e.target.value))}
-        type="number"
+      <TimerProgress
+        value={remainingTime}
+        maxValue={initialTime * 60 * 1000}
+        text={formatTime(remainingTime)}
       />
-      <button
-        onClick={() => {
-          sendUpdateStatus();
+      <input
+        type="number"
+        onChange={(e) => {
+            toggleReset();
+          const value = Number(e.target.value);
+          setInitialTime(value);
+          chrome.storage.local.set({ initialTime: value });
         }}
-      >
-        {isPlaying ? "Pause" : "Start"}
+        min={1}
+        max={120}
+        disabled={timerStatus}
+      />
+      <button onClick={() => toggleTimerStatus()}>
+        {timerStatus ? "Pause" : "Start"}
       </button>
-      <button onClick={() => handleReset()}>Reset</button>
+
+      <button onClick={() => toggleReset()}>reset</button>
     </div>
   );
 }
