@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import TimerProgress from "./TimerProgress";
+import "./content.css"
 function PomodoroTimer() {
   // used for the initial time input
   const [initialTime, setInitialTime] = React.useState(0);
@@ -57,16 +58,17 @@ function PomodoroTimer() {
     });
   };
   return (
-    <div>
+    <div className="pomodoro-timer-container">
       <TimerProgress
         value={remainingTime}
         maxValue={initialTime * 60 * 1000}
         text={formatTime(remainingTime)}
       />
       <input
+        className="input-initial-time"
         type="number"
         onChange={(e) => {
-            toggleReset();
+          toggleReset();
           const value = Number(e.target.value);
           setInitialTime(value);
           chrome.storage.local.set({ initialTime: value });
@@ -74,12 +76,19 @@ function PomodoroTimer() {
         min={1}
         max={120}
         disabled={timerStatus}
+        placeholder="Enter time in minutes"
       />
-      <button onClick={() => toggleTimerStatus()}>
-        {timerStatus ? "Pause" : "Start"}
-      </button>
-
-      <button onClick={() => toggleReset()}>reset</button>
+      <div className="button-container">
+        <button
+          className="button-toggle-status"
+          onClick={() => toggleTimerStatus()}
+        >
+          {timerStatus ? "Pause" : "Start"}
+        </button>
+        <button className="button-toggle-status" onClick={() => toggleReset()}>
+          reset
+        </button>
+      </div>
     </div>
   );
 }

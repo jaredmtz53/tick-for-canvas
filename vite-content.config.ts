@@ -1,16 +1,16 @@
 import { defineConfig } from 'vite'
 
-// https://vitejs.dev/config/
 export default defineConfig({
-  build:{
-    emptyOutDir: false, // So that popup build files don't get deleted
-    rollupOptions:{
-      input:{
-        content: "./content/content.tsx", // Entry Point  
+  build: {
+    emptyOutDir: false,
+    rollupOptions: {
+      input: {
+        content: './content/content.tsx',
       },
-      output:{
-        entryFileNames: "assets/[name].js"
+      output: {
+        entryFileNames: 'assets/[name].js',
+        assetFileNames: 'assets/[name][extname]' // <-- This stops the CSS from being hashed
       }
-    },
-  },
+    }
+  }
 })
