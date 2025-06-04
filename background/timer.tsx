@@ -1,5 +1,8 @@
+import { logCompletedPomodoro } from "./stats";
+
 let intervalId: ReturnType<typeof setInterval> | null = null;
 let endTime: number;
+
 export const startTimer = (inputDuration?: number) => {
   chrome.storage.local.get("remainingTime", (result) => {
     const durationToUse = result.remainingTime > 0 ? result.remainingTime : inputDuration || 0;
@@ -24,7 +27,8 @@ export const startTimer = (inputDuration?: number) => {
         }
       });
 
-      if (timeLeft === 0) {
+      if (timeLeft <= 0) {
+        logCompletedPomodoro();
         pauseTimer();
       }
     }, 1000);

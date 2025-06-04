@@ -1,0 +1,59 @@
+ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+.theme-button {
+  padding: 10px 20px;
+  border-radius: 10px;
+  border: 0;
+  background-color: rgb(235, 235, 235);
+  letter-spacing: 1.5px;
+  font-size: 15px;
+  transition: all 0.3s ease;
+  box-shadow: rgb(205, 205, 205) 0px 10px 0px 0px;
+  color: hsl(0, 0%, 0%);
+  cursor: pointer;
+}
+
+.theme-button:hover {
+  box-shadow: rgb(205, 205, 205) 0px 7px 0px 0px;
+}
+
+.theme-button:active {
+  background-color: rgb(235, 235, 235);
+  box-shadow: rgb(205, 205, 205) 0px 0px 0px 0px;
+  transform: translateY(5px);
+  transition: 200ms;
+}
+
+.theme-image {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+}
+.theme-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 1rem;
+}
+
+.theme-card {
+  background: #f8f8f8;
+  border-radius: 10px;
+  padding: 10px;
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.theme-card:hover {
+  transform: scale(1.05);
+}
+
+.theme-image {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  margin-bottom: 5px;
+}

@@ -10,7 +10,7 @@ export default defineConfig({
     rollupOptions: {
       input: {
         popup: './popup/index.html',
-       
+        output: '/options/options.html',
       },
       output: {
         entryFileNames: "assets/[name].js",
