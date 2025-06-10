@@ -1,0 +1,18 @@
+.pomodoro-icons-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 1rem;
+  justify-content: start;
+  align-items: center;
+  background-color: #f3f3f3;
+  border-radius: 1rem;
+  padding: .5rem;
+}
+
+.pomodoro-icon-img {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+    border-radius: 4px;
+}

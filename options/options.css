@@ -1,3 +1,61 @@
+.timer-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1rem;
+  padding: 1rem;
+  background-color: #f9f9f9;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.timer-options div {
+  display: flex;
+  flex-direction: column;
+}
+
+.timer-options label {
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+.timer-options input {
+  text-align: center;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+
+  font-size: 1rem;
+  max-width: 100px; /* NEW: limits the width */
+  width: 100%;       /* Keeps it responsive within its parent */
+  transition: border-color 0.2s ease;
+}
+.timer-options input:focus {
+  border-color: #007bff;
+  outline: none;
+}
+
+.input-error {
+  border-color: red !important;
+  box-shadow: 0 0 0 2px rgba(255, 0, 0, 0.2);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+Theme Settings 
+*/
+
 ul {
   list-style-type: none;
   padding: 0;

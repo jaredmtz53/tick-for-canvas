@@ -1,47 +1,40 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import TimerProgress from "./TimerProgress";
-import "./content.css";
+import "./timer.css";
 import { themes } from "../options/themes";
-import { CircularProgressbarWithChildren } from "react-circular-progressbar";
 function PomodoroTimer() {
-  // used for the initial time input
-  const [initialTime, setInitialTime] = React.useState(0);
-  // used for the remaining time in the timer
-  const [remainingTime, setRemainingTime] = React.useState(0);
-  // used to track the status of the timer (running or paused)
-  const [timerStatus, setTimerStatus] = React.useState(false); //False means paused, True means running
+  const [pomodoro, setPomodoro] = useState(25);
+  const [remainingTime, setRemainingTime] = useState(0);
+  const [timerStatus, setTimerStatus] = useState(false);
 
-  const [theme, setTheme] = React.useState({
+  const defaultTheme = {
     colors: {
       accent: "#a8d44b",
       background: "#29911b",
     },
-    image: "/assets/themes/avocado.png"
-    
-  });
-  useEffect(() => {
-    chrome.storage.local.get(["remainingTime", "initialTime"], (result) => {
-      setRemainingTime(result.remainingTime || 0);
-      setInitialTime(result.initialTime || 0);
-    });
+    image: "/assets/themes/avocado.png",
+  };
 
-    chrome.storage.sync.get(["theme"], (result) => {
-      const savedTheme = result.theme || "theme-avocado"; // Default to avocado theme
-      console.log("Saved theme:", savedTheme);
+  const [theme, setTheme] = useState(defaultTheme);
+
+  useEffect(() => {
+    chrome.storage.local.get(["remainingTime"], (result) => {
+      setRemainingTime(result.remainingTime || 0);
+    });
+    
+    chrome.storage.sync.get(["theme", "pomodoro"], (result) => {
+      setPomodoro(result.pomodoro || 25);
+      const savedTheme = result.theme || "theme-avocado";
       const themeObj = themes.find((theme) => theme.className === savedTheme);
       if (themeObj) {
         setTheme(themeObj);
       } else {
-        console.warn("Theme not found, using default colors.");
-        setTheme({
-          colors: {
-            accent: "#a8d44b",
-            background: "#29911b",
-          },
-          image: "/assets/themes/avocado.png" 
-        })
+        console.warn("Theme not found, using default theme.");
+        setTheme(defaultTheme);
       }
     });
+
+  
 
     const handleMessage = (message, sender, sendResponse) => {
       if (message.type === "update_timer") {
@@ -57,6 +50,8 @@ function PomodoroTimer() {
         }
       }
     };
+    
+    
     chrome.runtime.onMessage.addListener(handleMessage);
     return () => {
       chrome.runtime.onMessage.removeListener(handleMessage);
@@ -75,7 +70,7 @@ function PomodoroTimer() {
   const toggleTimerStatus = () => {
     const newStatus = !timerStatus;
     const durationToSend =
-      remainingTime > 0 ? remainingTime : initialTime * 60 * 1000;
+      remainingTime > 0 ? remainingTime : pomodoro * 60 * 1000;
 
     setTimerStatus(newStatus);
     chrome.runtime.sendMessage({
@@ -91,30 +86,27 @@ function PomodoroTimer() {
       type: "reset_timer",
     });
   };
+
   return (
     <div className="pomodoro-timer-container">
+      <button
+        className="top-right-setting-button"
+        onClick={() => {
+          chrome.runtime.sendMessage({ type: "open_settings" });
+        }}
+      >
+        <img
+          src={chrome.runtime.getURL("assets/icons/gear.svg")}
+          alt="Settings"
+        />
+      </button>
+
       <TimerProgress
         value={remainingTime}
-        maxValue={initialTime * 60 * 1000}
+        maxValue={pomodoro * 60 * 1000}
         text={formatTime(remainingTime)}
         backgroundColor={theme.colors.background}
         accentColor={theme.colors.accent}
-      />
-      
-      <input
-        value={initialTime}
-        className="input-initial-time"
-        type="number"
-        onChange={(e) => {
-          resetTimer();
-          const value = Math.max(1, Number(e.target.value)); // Ensure at least 1
-          setInitialTime(value);
-          chrome.storage.local.set({ initialTime: value });
-        }}
-        min={1}
-        max={120}
-        disabled={timerStatus}
-        placeholder="Enter time in minutes"
       />
       <div className="button-container">
         <button

@@ -5,10 +5,11 @@ let endTime: number;
 
 export const startTimer = (inputDuration?: number) => {
   chrome.storage.local.get("remainingTime", (result) => {
-    const durationToUse = result.remainingTime > 0 ? result.remainingTime : inputDuration || 0;
+    const durationToUse =
+      result.remainingTime > 0 ? result.remainingTime : inputDuration || 0;
 
     // set status and endTime
-     endTime = Date.now() + durationToUse;
+    endTime = Date.now() + durationToUse;
 
     chrome.storage.local.set({ status: true, endTime });
 
